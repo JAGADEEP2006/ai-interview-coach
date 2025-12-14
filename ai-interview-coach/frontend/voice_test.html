@@ -1,0 +1,84 @@
+async function submitToBackend() {
+    // Stop timer
+    stopQuestionTimer();
+    
+    // Show loading
+    loadingOverlay.style.display = 'flex';
+    loadingText.textContent = 'Analyzing your voice responses...';
+    
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        // Prepare simple data (no actual audio files for now)
+        const submissionData = {
+            user_id: user.id,
+            answers: {},
+            duration: 0
+        };
+        
+        // Add some sample answers
+        for (let i = 0; i < questions.length; i++) {
+            const question = questions[i];
+            submissionData.answers[question.id] = {
+                text: transcriptions[question.id] || `Voice response for question ${question.id}`,
+                duration: 60 // seconds
+            };
+        }
+        
+        console.log('Submitting voice test:', submissionData);
+        
+        // Send to backend
+        const response = await fetch('http://localhost/ai-interview-coach/backend-php/api/voice_test.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(submissionData)
+        });
+        
+        const result = await response.json();
+        console.log('Voice test response:', result);
+        
+        if (result.success) {
+            // Store result
+            localStorage.setItem('voice_test_result', JSON.stringify(result));
+            localStorage.setItem('voice_score', result.overall_score || result.score || 0);
+            
+            // Show results
+            testInterface.style.display = 'none';
+            showResults(result);
+            
+        } else {
+            throw new Error(result.message || 'Voice test failed');
+        }
+        
+    } catch (error) {
+        console.error('Voice test submission error:', error);
+        
+        // Fallback to simulated response
+        const simulatedResult = {
+            success: true,
+            score: 78,
+            overall_score: 78,
+            analysis: {
+                fluency_score: 82,
+                pronunciation_score: 85,
+                confidence_score: 72,
+                grammar_score: 76
+            },
+            feedback: "Good verbal communication skills. Your speech shows clarity and good pacing. Practice to improve confidence and reduce filler words.",
+            transcription: "Your voice was analyzed successfully. You demonstrate good pronunciation and clarity with room for improvement in confidence and fluency.",
+            message: "Voice test completed (simulated data)"
+        };
+        
+        localStorage.setItem('voice_test_result', JSON.stringify(simulatedResult));
+        localStorage.setItem('voice_score', simulatedResult.overall_score);
+        testInterface.style.display = 'none';
+        showResults(simulatedResult);
+        
+        alert('Note: Using simulated data. Real voice analysis will work when audio processing is configured.');
+        
+    } finally {
+        loadingOverlay.style.display = 'none';
+    }
+}

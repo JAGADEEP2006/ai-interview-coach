@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Interview Coach</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.html">AI Interview Coach</a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-link">Welcome, <span id="userName"></span></span>
+                <a class="nav-link" href="results.html">Results</a>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Interview Preparation Dashboard</h2>
+                <p class="text-muted">Complete all 4 steps to get your overall interview readiness score</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Progress Tracker -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Progress</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-steps">
+                            <div class="step completed" id="step1">
+                                <div class="step-circle">1</div>
+                                <div class="step-content">
+                                    <h6>Upload Resume</h6>
+                                    <small>AI analysis of your resume</small>
+                                </div>
+                            </div>
+                            <div class="step" id="step2">
+                                <div class="step-circle">2</div>
+                                <div class="step-content">
+                                    <h6>Text Test</h6>
+                                    <small>Written communication skills</small>
+                                </div>
+                            </div>
+                            <div class="step" id="step3">
+                                <div class="step-circle">3</div>
+                                <div class="step-content">
+                                    <h6>Voice Test</h6>
+                                    <small>Verbal communication skills</small>
+                                </div>
+                            </div>
+                            <div class="step" id="step4">
+                                <div class="step-circle">4</div>
+                                <div class="step-content">
+                                    <h6>Video Test</h6>
+                                    <small>Body language & presentation</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <h5>Overall Score</h5>
+                        <div class="score-circle" id="overallScore">--</div>
+                        <p class="text-muted">Complete all tests to see your score</p>
+                        <a href="results.html" class="btn btn-primary">View Detailed Results</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Cards -->
+            <div class="col-md-9">
+                <div class="row">
+                    <!-- Resume Analysis Card -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-file-earmark-text text-primary"></i>
+                                        Resume Analysis
+                                    </h5>
+                                    <span class="badge bg-success" id="resumeStatus">Not Started</span>
+                                </div>
+                                <p class="card-text">Upload your resume for AI analysis. Get scores on skills, formatting, and job category suggestions.</p>
+                                <div class="mt-3">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" id="resumeProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Score: <strong id="resumeScore">--/100</strong></span>
+                                        <a href="upload_resume.html" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-upload"></i> Start
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Test Card -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-chat-left-text text-primary"></i>
+                                        Text Test
+                                    </h5>
+                                    <span class="badge bg-secondary" id="textStatus">Not Started</span>
+                                </div>
+                                <p class="card-text">Answer interview questions in writing. AI evaluates grammar, vocabulary, and clarity.</p>
+                                <div class="mt-3">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" id="textProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Score: <strong id="textScore">--/100</strong></span>
+                                        <a href="text_test.html" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-pencil"></i> Start
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice Test Card -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-mic text-primary"></i>
+                                        Voice Test
+                                    </h5>
+                                    <span class="badge bg-secondary" id="voiceStatus">Not Started</span>
+                                </div>
+                                <p class="card-text">Answer questions by speaking. AI analyzes fluency, confidence, and pronunciation.</p>
+                                <div class="mt-3">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" id="voiceProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Score: <strong id="voiceScore">--/100</strong></span>
+                                        <a href="voice_test.html" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-mic-fill"></i> Start
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Test Card -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-camera-video text-primary"></i>
+                                        Video Test
+                                    </h5>
+                                    <span class="badge bg-secondary" id="videoStatus">Not Started</span>
+                                </div>
+                                <p class="card-text">Record video responses. AI evaluates eye contact, body language, and presentation skills.</p>
+                                <div class="mt-3">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" id="videoProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Score: <strong id="videoScore">--/100</strong></span>
+                                        <a href="video_test.html" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-record-circle"></i> Start
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card mt-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Recent Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list" id="activityList">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <p>Welcome to AI Interview Coach! Start by uploading your resume.</p>
+                                    <small class="text-muted">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Load user data
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('userName').textContent = user.full_name || user.username;
+            loadDashboardData(user.id);
+        });
+
+        function loadDashboardData(userId) {
+            // Load scores from localStorage or API
+            const resumeScore = localStorage.getItem('resume_score') || 0;
+            const textScore = localStorage.getItem('text_score') || 0;
+            const voiceScore = localStorage.getItem('voice_score') || 0;
+            const videoScore = localStorage.getItem('video_score') || 0;
+            
+            // Update progress bars
+            updateProgress('resume', resumeScore);
+            updateProgress('text', textScore);
+            updateProgress('voice', voiceScore);
+            updateProgress('video', videoScore);
+            
+            // Update step completion
+            updateStepCompletion(resumeScore, textScore, voiceScore, videoScore);
+            
+            // Calculate overall score
+            if (resumeScore > 0 || textScore > 0 || voiceScore > 0 || videoScore > 0) {
+                const overall = (parseFloat(resumeScore) + parseFloat(textScore) + 
+                               parseFloat(voiceScore) + parseFloat(videoScore)) / 4;
+                document.getElementById('overallScore').textContent = Math.round(overall);
+            }
+        }
+
+        function updateProgress(testType, score) {
+            const scoreNum = parseFloat(score) || 0;
+            const progressBar = document.getElementById(testType + 'Progress');
+            const scoreElement = document.getElementById(testType + 'Score');
+            const statusElement = document.getElementById(testType + 'Status');
+            
+            if (progressBar) {
+                progressBar.style.width = scoreNum + '%';
+                progressBar.textContent = Math.round(scoreNum) + '%';
+            }
+            
+            if (scoreElement) {
+                scoreElement.textContent = Math.round(scoreNum) + '/100';
+            }
+            
+            if (statusElement) {
+                if (scoreNum > 0) {
+                    statusElement.textContent = 'Completed';
+                    statusElement.className = 'badge bg-success';
+                } else {
+                    statusElement.textContent = 'Not Started';
+                    statusElement.className = 'badge bg-secondary';
+                }
+            }
+        }
+
+        function updateStepCompletion(resume, text, voice, video) {
+            const steps = document.querySelectorAll('.step');
+            
+            // Step 1 (Resume)
+            if (resume > 0) {
+                steps[0].classList.add('completed');
+            }
+            
+            // Step 2 (Text)
+            if (text > 0) {
+                steps[1].classList.add('completed');
+            }
+            
+            // Step 3 (Voice)
+            if (voice > 0) {
+                steps[2].classList.add('completed');
+            }
+            
+            // Step 4 (Video)
+            if (video > 0) {
+                steps[3].classList.add('completed');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('resume_score');
+            localStorage.removeItem('text_score');
+            localStorage.removeItem('voice_score');
+            localStorage.removeItem('video_score');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

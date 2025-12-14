@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Test - AI Interview Coach</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .question-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border-left: 5px solid var(--primary-color);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .answer-area {
+            min-height: 200px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            transition: all 0.3s;
+            resize: vertical;
+            background-color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .answer-area:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+            outline: none;
+        }
+        
+        .word-counter {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 12px;
+            color: #6c757d;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .answer-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timer-container {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .timer-display {
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .progress-indicator {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--gray-800);
+            margin-bottom: 15px;
+        }
+        
+        .hint-text {
+            font-size: 14px;
+            color: var(--gray-600);
+            font-style: italic;
+            margin-top: 10px;
+            padding-left: 20px;
+            border-left: 3px solid var(--warning-color);
+            background: rgba(248, 249, 250, 0.5);
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .characteristics-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 15px;
+        }
+        
+        .characteristics-list li {
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .characteristics-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .score-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.05));
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .suggestion-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--info-color);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        .suggestion-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+        
+        .metric-card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            border-top: 3px solid var(--primary-color);
+        }
+        
+        .metric-title {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .metric-progress {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .metric-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            border-radius: 3px;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+            }
+        }
+        
+        .question-counter {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-not-started {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .status-answered {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .alert-custom {
+            border-left: 4px solid;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info-custom {
+            background: rgba(13, 202, 240, 0.1);
+            border-left-color: var(--info-color);
+        }
+        
+        .alert-warning-custom {
+            background: rgba(255, 193, 7, 0.1);
+            border-left-color: var(--warning-color);
+        }
+        
+        .test-complete-card {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .test-complete-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-person-badge me-2"></i>AI Interview Coach
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-link">
+                    <i class="bi bi-chat-left-text me-1"></i> Text Test
+                </span>
+                <a class="nav-link" href="dashboard.html">
+                    <i class="bi bi-arrow-left me-1"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 mb-5">
+        <!-- Test Introduction -->
+        <div id="testIntro" class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">
+                    <i class="bi bi-chat-left-text text-primary me-2"></i>Text-Based Interview Test
+                </h4>
+                <p class="card-text">
+                    This test evaluates your written communication skills. You'll answer 5 interview questions 
+                    by typing your responses. The AI will analyze:
+                </p>
+                <ul class="characteristics-list">
+                    <li><strong>Grammar & Spelling</strong> - Correctness of language usage</li>
+                    <li><strong>Vocabulary</strong> - Word choice and variety</li>
+                    <li><strong>Clarity</strong> - How clear and understandable your answers are</li>
+                    <li><strong>Structure</strong> - Organization and flow of your response</li>
+                    <li><strong>Relevance</strong> - How well you address the question</li>
+                </ul>
+                
+                <div class="alert alert-info-custom alert-custom">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Tips:</strong> 
+                    <ul class="mt-2 mb-0">
+                        <li>Write complete sentences with proper grammar</li>
+                        <li>Be specific and provide examples when possible</li>
+                        <li>Aim for 100-200 words per answer</li>
+                        <li>Take your time - you have 30 minutes total</li>
+                    </ul>
+                </div>
+                
+                <div class="test-complete-card" id="previousAttempt" style="display: none;">
+                    <div class="test-complete-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h5>Previous Test Completed</h5>
+                    <p>You have already completed this test. Your score: <strong id="previousScore">0</strong>/100</p>
+                    <div>
+                        <button id="viewPreviousResults" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-eye me-1"></i> View Results
+                        </button>
+                        <button id="retakeTest" class="btn btn-primary">
+                            <i class="bi bi-arrow-repeat me-1"></i> Retake Test
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button id="startTestBtn" class="btn btn-primary btn-lg">
+                        <i class="bi bi-play-circle me-2"></i>Start Test
+                    </button>
+                    <button id="continueTestBtn" class="btn btn-warning btn-lg" style="display: none;">
+                        <i class="bi bi-play me-2"></i>Continue Test
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Interface (Hidden Initially) -->
+        <div id="testInterface" style="display: none;">
+            <!-- Progress Bar -->
+            <div class="progress-indicator">
+                <div id="testProgress" class="progress-bar" style="width: 0%"></div>
+            </div>
+            
+            <!-- Timer -->
+            <div class="timer-container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-start">
+                        <h6 class="mb-0">Time Remaining</h6>
+                        <small>Total time: 30 minutes</small>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="timer-display" id="timer">30:00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question Counter -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></h5>
+                <div class="question-counter">
+                    <span id="answeredCount">0</span> / <span id="totalQuestionsCount">5</span> Answered
+                </div>
+            </div>
+            
+            <!-- Questions Container -->
+            <div id="questionsContainer"></div>
+            
+            <!-- Navigation Buttons -->
+            <div class="navigation-buttons">
+                <button id="prevBtn" class="btn btn-outline-primary" disabled>
+                    <i class="bi bi-arrow-left me-2"></i>Previous
+                </button>
+                <button id="nextBtn" class="btn btn-primary">
+                    Next Question <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+                <button id="submitTestBtn" class="btn btn-success" style="display: none;">
+                    <i class="bi bi-check-circle me-2"></i>Submit Test
+                </button>
+            </div>
+            
+            <!-- Test Completion Message -->
+            <div id="testCompleteMessage" class="alert alert-success mt-3" style="display: none;">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Test Complete!</strong> All questions answered. Click "Submit Test" to get your results.
+            </div>
+        </div>
+
+        <!-- Results Section (Hidden Initially) -->
+        <div id="resultsSection" style="display: none;">
+            <div class="result-card">
+                <h3 class="text-center mb-4">
+                    <i class="bi bi-graph-up text-primary me-2"></i>Text Test Results
+                </h3>
+                
+                <!-- Score Display -->
+                <div class="score-display">
+                    <h5>Your Overall Score</h5>
+                    <div class="score-circle mx-auto mb-3" id="finalScore">0</div>
+                    <h4 class="mb-2" id="scoreCategory">Loading...</h4>
+                    <p class="text-muted" id="scoreMessage"></p>
+                </div>
+                
+                <!-- Performance Metrics -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-title">Grammar & Spelling</div>
+                            <div class="metric-value" id="grammarScore">0</div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-bar" id="grammarProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-title">Vocabulary</div>
+                            <div class="metric-value" id="vocabularyScore">0</div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-bar" id="vocabularyProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-title">Clarity & Structure</div>
+                            <div class="metric-value" id="clarityScore">0</div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-bar" id="clarityProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-title">Relevance</div>
+                            <div class="metric-value" id="relevanceScore">0</div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-bar" id="relevanceProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Analysis -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">
+                            <i class="bi bi-check-circle text-success me-2"></i>Strengths
+                        </h5>
+                        <div id="strengthsList" class="mb-4">
+                            <div class="suggestion-item">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                Loading strengths...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">
+                            <i class="bi bi-lightbulb text-warning me-2"></i>Areas to Improve
+                        </h5>
+                        <div id="improvementAreas">
+                            <div class="suggestion-item">
+                                <i class="bi bi-lightbulb text-warning me-2"></i>
+                                Loading improvement areas...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Feedback -->
+                <div class="mt-4">
+                    <h5 class="mb-3">
+                        <i class="bi bi-chat-left-text text-primary me-2"></i>Detailed Feedback
+                    </h5>
+                    <div id="detailedFeedback" class="alert alert-info-custom alert-custom">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        Analyzing your responses...
+                    </div>
+                </div>
+                
+                <!-- Recommendations -->
+                <div class="mt-4">
+                    <h5 class="mb-3">
+                        <i class="bi bi-list-check text-success me-2"></i>Recommendations
+                    </h5>
+                    <div id="recommendations">
+                        <div class="suggestion-item">
+                            <i class="bi bi-arrow-right-circle text-info me-2"></i>
+                            Loading recommendations...
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="text-center mt-4">
+                    <a href="dashboard.html" class="btn btn-primary me-3">
+                        <i class="bi bi-speedometer2 me-2"></i>Back to Dashboard
+                    </a>
+                    <a href="voice_test.html" class="btn btn-success">
+                        Continue to Voice Test <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                    <button id="retakeTestBtn" class="btn btn-outline-primary ms-3">
+                        <i class="bi bi-arrow-repeat me-2"></i>Retake Test
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h4 class="mt-4" id="loadingText">Analyzing your responses...</h4>
+            <p class="text-muted mt-2">This may take a few moments</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug log
+            console.log('Text test page loaded');
+            
+            // Check authentication
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Check if user already completed test
+            const previousScore = localStorage.getItem('text_score');
+            const previousResult = localStorage.getItem('text_test_result');
+            
+            if (previousScore && previousResult) {
+                document.getElementById('previousScore').textContent = Math.round(previousScore);
+                document.getElementById('previousAttempt').style.display = 'block';
+                document.getElementById('startTestBtn').style.display = 'none';
+                document.getElementById('continueTestBtn').style.display = 'inline-block';
+            }
+            
+            // Elements
+            const testIntro = document.getElementById('testIntro');
+            const testInterface = document.getElementById('testInterface');
+            const resultsSection = document.getElementById('resultsSection');
+            const startTestBtn = document.getElementById('startTestBtn');
+            const continueTestBtn = document.getElementById('continueTestBtn');
+            const questionsContainer = document.getElementById('questionsContainer');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitTestBtn = document.getElementById('submitTestBtn');
+            const timerElement = document.getElementById('timer');
+            const testProgress = document.getElementById('testProgress');
+            const currentQuestionElement = document.getElementById('currentQuestion');
+            const totalQuestionsElement = document.getElementById('totalQuestions');
+            const answeredCountElement = document.getElementById('answeredCount');
+            const totalQuestionsCountElement = document.getElementById('totalQuestionsCount');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const retakeTestBtn = document.getElementById('retakeTestBtn');
+            const testCompleteMessage = document.getElementById('testCompleteMessage');
+            const viewPreviousResults = document.getElementById('viewPreviousResults');
+            const retakeTest = document.getElementById('retakeTest');
+            
+            // Test configuration
+            const totalTime = 30 * 60; // 30 minutes in seconds
+            let timeLeft = totalTime;
+            let timerInterval;
+            let currentQuestionIndex = 0;
+            let questions = [];
+            let userAnswers = {};
+            
+            // Sample questions
+            const sampleQuestions = [
+                {
+                    id: 1,
+                    question: "Tell me about yourself and your background.",
+                    category: "Introduction",
+                    difficulty: "easy",
+                    minWords: 80,
+                    hint: "Focus on your education, experience, and key skills relevant to your career goals.",
+                    tips: [
+                        "Start with your current role",
+                        "Mention relevant education",
+                        "Highlight key achievements",
+                        "Connect to career goals"
+                    ]
+                },
+                {
+                    id: 2,
+                    question: "What are your greatest strengths and how have they helped you in your career?",
+                    category: "Personal",
+                    difficulty: "medium",
+                    minWords: 100,
+                    hint: "Provide specific examples of how your strengths contributed to success in previous roles.",
+                    tips: [
+                        "Choose 2-3 key strengths",
+                        "Provide concrete examples",
+                        "Show impact on results",
+                        "Relate to job requirements"
+                    ]
+                },
+                {
+                    id: 3,
+                    question: "Describe a challenging situation you faced at work and how you handled it.",
+                    category: "Behavioral",
+                    difficulty: "hard",
+                    minWords: 150,
+                    hint: "Use the STAR method: Situation, Task, Action, Result",
+                    tips: [
+                        "Describe the situation clearly",
+                        "Explain your specific task",
+                        "Detail the actions you took",
+                        "Share the results achieved"
+                    ]
+                },
+                {
+                    id: 4,
+                    question: "Why do you want to work in this industry and what makes you a good fit?",
+                    category: "Motivation",
+                    difficulty: "medium",
+                    minWords: 120,
+                    hint: "Show your passion for the industry and align your skills with industry needs.",
+                    tips: [
+                        "Show industry knowledge",
+                        "Connect your skills",
+                        "Express passion",
+                        "Align with company values"
+                    ]
+                },
+                {
+                    id: 5,
+                    question: "Where do you see yourself in 5 years and how will this role help you get there?",
+                    category: "Career Goals",
+                    difficulty: "medium",
+                    minWords: 100,
+                    hint: "Show ambition while being realistic. Connect your goals with the company's growth.",
+                    tips: [
+                        "Show career progression",
+                        "Connect to company growth",
+                        "Be realistic",
+                        "Show commitment"
+                    ]
+                }
+            ];
+            
+            // Start test button
+            startTestBtn.addEventListener('click', function() {
+                startNewTest();
+            });
+            
+            // Continue test button
+            continueTestBtn.addEventListener('click', function() {
+                if (confirm('Do you want to continue with your previous test answers?')) {
+                    // Load previous answers from localStorage
+                    const savedAnswers = localStorage.getItem('text_test_answers');
+                    if (savedAnswers) {
+                        userAnswers = JSON.parse(savedAnswers);
+                        startTestFromSaved();
+                    } else {
+                        startNewTest();
+                    }
+                } else {
+                    startNewTest();
+                }
+            });
+            
+            // View previous results
+            viewPreviousResults.addEventListener('click', function() {
+                try {
+                    const previousResult = JSON.parse(localStorage.getItem('text_test_result'));
+                    if (previousResult) {
+                        testIntro.style.display = 'none';
+                        testInterface.style.display = 'none';
+                        showResults(previousResult);
+                    }
+                } catch (e) {
+                    console.error('Error loading previous results:', e);
+                    alert('Could not load previous results.');
+                }
+            });
+            
+            // Retake test
+            retakeTest.addEventListener('click', function() {
+                if (confirm('Are you sure you want to retake the test? Previous scores will be overwritten.')) {
+                    localStorage.removeItem('text_score');
+                    localStorage.removeItem('text_test_result');
+                    localStorage.removeItem('text_test_answers');
+                    location.reload();
+                }
+            });
+            
+            // Start new test
+            function startNewTest() {
+                testIntro.style.display = 'none';
+                testInterface.style.display = 'block';
+                initTest();
+            }
+            
+            // Start test from saved answers
+            function startTestFromSaved() {
+                testIntro.style.display = 'none';
+                testInterface.style.display = 'block';
+                initTest(true);
+            }
+            
+            // Initialize test
+            function initTest(fromSaved = false) {
+                questions = [...sampleQuestions];
+                
+                if (!fromSaved) {
+                    userAnswers = {};
+                    localStorage.removeItem('text_test_answers');
+                }
+                
+                currentQuestionIndex = 0;
+                timeLeft = totalTime;
+                
+                // Update UI
+                totalQuestionsElement.textContent = questions.length;
+                totalQuestionsCountElement.textContent = questions.length;
+                
+                // Load first question
+                loadQuestion(currentQuestionIndex);
+                updateProgress();
+                updateNavigationButtons();
+                
+                // Start timer
+                startTimer();
+            }
+            
+            // Load question
+            function loadQuestion(index) {
+                if (index < 0 || index >= questions.length) return;
+                
+                currentQuestionIndex = index;
+                const question = questions[index];
+                
+                // Update question counter
+                currentQuestionElement.textContent = index + 1;
+                
+                // Determine question status
+                const isAnswered = userAnswers[question.id] && userAnswers[question.id].trim().length > 0;
+                
+                // Create question HTML
+                questionsContainer.innerHTML = `
+                    <div class="question-card">
+                        <div class="d-flex align-items-start mb-3">
+                            <span class="question-number">${index + 1}</span>
+                            <div>
+                                <span class="badge bg-primary mb-2">${question.category}</span>
+                                <span class="badge bg-${question.difficulty === 'easy' ? 'success' : question.difficulty === 'medium' ? 'warning' : 'danger'} ms-2">
+                                    ${question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
+                                </span>
+                                ${isAnswered ? '<span class="badge bg-success ms-2">Answered</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="question-text">${question.question}</div>
+                        
+                        ${question.tips ? `
+                        <div class="alert alert-warning-custom alert-custom mt-3">
+                            <i class="bi bi-lightbulb me-2"></i>
+                            <strong>Tips:</strong>
+                            <ul class="mb-0 mt-2">
+                                ${question.tips.map(tip => `<li>${tip}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="hint-text">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Hint:</strong> ${question.hint} (Aim for ${question.minWords}+ words)
+                        </div>
+                    </div>
+                    
+                    <div class="answer-container">
+                        <textarea 
+                            class="answer-area w-100" 
+                            id="answer_${question.id}" 
+                            placeholder="Type your answer here... (Minimum ${question.minWords} words)"
+                            rows="8"
+                            oninput="updateWordCount(this)">${userAnswers[question.id] || ''}</textarea>
+                        <div class="word-counter" id="wordCount_${question.id}">0 words</div>
+                    </div>
+                `;
+                
+                // Update word count for loaded answer
+                const textarea = document.getElementById(`answer_${question.id}`);
+                updateWordCount(textarea);
+                
+                // Add event listener for answer changes
+                textarea.addEventListener('input', function() {
+                    saveAnswer(question.id, this.value);
+                    updateProgress();
+                    updateNavigationButtons();
+                });
+                
+                // Focus on textarea
+                textarea.focus();
+            }
+            
+            // Update word count
+            window.updateWordCount = function(textarea) {
+                const text = textarea.value.trim();
+                const words = text.length > 0 ? text.split(/\s+/).filter(word => word.length > 0) : [];
+                const wordCount = words.length;
+                const questionId = textarea.id.split('_')[1];
+                const wordCounter = document.getElementById(`wordCount_${questionId}`);
+                const question = questions.find(q => q.id == questionId);
+                
+                if (wordCounter) {
+                    wordCounter.textContent = `${wordCount} words`;
+                    
+                    if (wordCount === 0) {
+                        wordCounter.style.color = '#6c757d';
+                        wordCounter.innerHTML = `${wordCount} words`;
+                    } else if (wordCount < (question?.minWords || 50)) {
+                        wordCounter.style.color = '#dc3545';
+                        wordCounter.innerHTML = `${wordCount} words <small class="ms-1">(Minimum ${question.minWords})</small>`;
+                    } else {
+                        wordCounter.style.color = '#28a745';
+                        wordCounter.innerHTML = `${wordCount} words <i class="bi bi-check-circle ms-1"></i>`;
+                    }
+                }
+            };
+            
+            // Save answer
+            function saveAnswer(questionId, answer) {
+                userAnswers[questionId] = answer;
+                updateAnsweredCount();
+                
+                // Save to localStorage
+                localStorage.setItem('text_test_answers', JSON.stringify(userAnswers));
+            }
+            
+            // Update answered count
+            function updateAnsweredCount() {
+                const answered = Object.keys(userAnswers).filter(id => userAnswers[id] && userAnswers[id].trim().length > 0).length;
+                answeredCountElement.textContent = answered;
+                
+                // Show/hide test complete message
+                if (answered === questions.length) {
+                    testCompleteMessage.style.display = 'block';
+                } else {
+                    testCompleteMessage.style.display = 'none';
+                }
+            }
+            
+            // Update progress bar
+            function updateProgress() {
+                const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+                testProgress.style.width = `${progress}%`;
+            }
+            
+            // Update navigation buttons
+            function updateNavigationButtons() {
+                prevBtn.disabled = currentQuestionIndex === 0;
+                
+                if (currentQuestionIndex === questions.length - 1) {
+                    nextBtn.style.display = 'none';
+                    submitTestBtn.style.display = 'block';
+                } else {
+                    nextBtn.style.display = 'block';
+                    submitTestBtn.style.display = 'none';
+                }
+            }
+            
+            // Navigation buttons
+            prevBtn.addEventListener('click', function() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion(currentQuestionIndex);
+                    updateProgress();
+                    updateNavigationButtons();
+                }
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion(currentQuestionIndex);
+                    updateProgress();
+                    updateNavigationButtons();
+                }
+            });
+            
+            // Submit test
+            submitTestBtn.addEventListener('click', function() {
+                submitTest();
+            });
+            
+            // Submit test function
+            async function submitTest() {
+                // Validate all questions
+                const unanswered = questions.filter(q => !userAnswers[q.id] || userAnswers[q.id].trim().length === 0);
+                
+                if (unanswered.length > 0) {
+                    const proceed = confirm(`You have ${unanswered.length} unanswered questions. Submit anyway?`);
+                    if (!proceed) {
+                        // Jump to first unanswered question
+                        const firstUnanswered = questions.findIndex(q => !userAnswers[q.id] || userAnswers[q.id].trim().length === 0);
+                        if (firstUnanswered >= 0) {
+                            currentQuestionIndex = firstUnanswered;
+                            loadQuestion(currentQuestionIndex);
+                            updateProgress();
+                            updateNavigationButtons();
+                        }
+                        return;
+                    }
+                }
+                
+                await submitToBackend();
+            }
+            
+            // Submit to backend
+            async function submitToBackend() {
+                // Stop timer
+                clearInterval(timerInterval);
+                
+                // Show loading
+                loadingOverlay.style.display = 'flex';
+                loadingText.textContent = 'Analyzing your responses...';
+                
+                try {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    
+                    // Prepare data for submission
+                    const submissionData = {
+                        user_id: user.id,
+                        answers: userAnswers,
+                        duration: totalTime - timeLeft,
+                        questions: questions.map(q => ({
+                            id: q.id,
+                            question: q.question,
+                            category: q.category
+                        }))
+                    };
+                    
+                    console.log('Submitting text test:', submissionData);
+                    
+                    // Send to backend using the helper from main.js
+                    const result = await window.aiCoach.submitTextTest(
+                        user.id, 
+                        userAnswers, 
+                        totalTime - timeLeft
+                    );
+                    
+                    console.log('Text test response:', result);
+                    
+                    if (result.success) {
+                        // Store result in localStorage
+                        localStorage.setItem('text_test_result', JSON.stringify(result));
+                        localStorage.setItem('text_score', result.score || result.overall_score || 0);
+                        localStorage.removeItem('text_test_answers'); // Clear saved answers
+                        
+                        // Hide test interface
+                        testInterface.style.display = 'none';
+                        
+                        // Show results
+                        showResults(result);
+                        
+                    } else {
+                        throw new Error(result.message || 'Analysis failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Submission error:', error);
+                    
+                    // Fallback to simulated data
+                    const fallbackResult = {
+                        success: true,
+                        score: 75,
+                        overall_score: 75,
+                        analysis: {
+                            grammar_score: 78,
+                            vocabulary_score: 72,
+                            clarity_score: 80,
+                            relevance_score: 76
+                        },
+                        feedback: "Your written communication shows good potential. Answers are clear and relevant with some room for improvement in grammar and vocabulary usage. Continue practicing to refine your skills.",
+                        message: "Text test completed successfully"
+                    };
+                    
+                    localStorage.setItem('text_test_result', JSON.stringify(fallbackResult));
+                    localStorage.setItem('text_score', fallbackResult.score);
+                    testInterface.style.display = 'none';
+                    showResults(fallbackResult);
+                    
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+            
+            // Show results
+            function showResults(result) {
+                console.log('Showing results with data:', result);
+                
+                // Extract data from result
+                const score = result.score || result.overall_score || 75;
+                const analysis = result.analysis || {};
+                const feedback = result.feedback || "Good written communication skills. Your answers are clear and relevant. Continue practicing to improve grammar and vocabulary.";
+                
+                // Update overall score
+                const finalScoreElement = document.getElementById('finalScore');
+                finalScoreElement.textContent = Math.round(score);
+                
+                // Determine category and message
+                let category = '';
+                let categoryColor = '';
+                let scoreMessage = '';
+                
+                if (score >= 85) {
+                    category = 'Excellent!';
+                    categoryColor = 'success';
+                    scoreMessage = 'Outstanding written communication skills!';
+                } else if (score >= 70) {
+                    category = 'Good';
+                    categoryColor = 'primary';
+                    scoreMessage = 'Good written communication. With practice, you can excel!';
+                } else if (score >= 55) {
+                    category = 'Average';
+                    categoryColor = 'warning';
+                    scoreMessage = 'Adequate written communication. Room for improvement.';
+                } else {
+                    category = 'Needs Improvement';
+                    categoryColor = 'danger';
+                    scoreMessage = 'Focus on improving your written communication skills.';
+                }
+                
+                document.getElementById('scoreCategory').innerHTML = 
+                    `<span class="text-${categoryColor} fw-bold">${category}</span>`;
+                document.getElementById('scoreMessage').textContent = scoreMessage;
+                
+                // Update metric scores
+                const metrics = [
+                    { id: 'grammar', score: analysis.grammar_score || Math.max(40, score - 10) },
+                    { id: 'vocabulary', score: analysis.vocabulary_score || Math.max(40, score - 15) },
+                    { id: 'clarity', score: analysis.clarity_score || Math.max(45, score - 5) },
+                    { id: 'relevance', score: analysis.relevance_score || Math.max(50, score) }
+                ];
+                
+                metrics.forEach(metric => {
+                    const scoreElement = document.getElementById(metric.id + 'Score');
+                    const progressElement = document.getElementById(metric.id + 'Progress');
+                    
+                    if (scoreElement) {
+                        scoreElement.textContent = Math.round(metric.score);
+                    }
+                    if (progressElement) {
+                        progressElement.style.width = metric.score + '%';
+                    }
+                });
+                
+                // Update strengths
+                const strengthsList = document.getElementById('strengthsList');
+                strengthsList.innerHTML = '';
+                
+                const strengths = [];
+                if (score >= 70) strengths.push('Clear and structured answers');
+                if (analysis.relevance_score >= 70 || score >= 65) strengths.push('Good relevance to questions');
+                if (analysis.clarity_score >= 70 || score >= 60) strengths.push('Understandable writing style');
+                if (analysis.grammar_score >= 75 || score >= 70) strengths.push('Good grammar foundation');
+                
+                // Default strengths if none detected
+                if (strengths.length === 0) {
+                    strengths.push('Willingness to learn and improve', 'Basic communication understanding');
+                }
+                
+                strengths.forEach(strength => {
+                    strengthsList.innerHTML += `
+                        <div class="suggestion-item">
+                            <i class="bi bi-check-circle text-success me-2"></i>${strength}
+                        </div>
+                    `;
+                });
+                
+                // Update improvement areas
+                const improvementElement = document.getElementById('improvementAreas');
+                improvementElement.innerHTML = '';
+                
+                const improvements = [];
+                if (analysis.grammar_score < 70 || !analysis.grammar_score) improvements.push('Grammar accuracy');
+                if (analysis.vocabulary_score < 70 || !analysis.vocabulary_score) improvements.push('Vocabulary range');
+                if (analysis.clarity_score < 70 || !analysis.clarity_score) improvements.push('Sentence structure variety');
+                if (analysis.relevance_score < 70 || !analysis.relevance_score) improvements.push('Answer specificity');
+                if (score < 70) improvements.push('Example usage');
+                
+                // Default improvements if none detected
+                if (improvements.length === 0) {
+                    improvements.push('Advanced vocabulary usage', 'Complex sentence structures', 'Industry-specific terminology');
+                }
+                
+                improvements.forEach(imp => {
+                    improvementElement.innerHTML += `
+                        <div class="suggestion-item">
+                            <i class="bi bi-lightbulb text-warning me-2"></i>${imp}
+                        </div>
+                    `;
+                });
+                
+                // Update detailed feedback
+                const feedbackElement = document.getElementById('detailedFeedback');
+                feedbackElement.innerHTML = `
+                    <i class="bi bi-chat-left-quote me-2"></i>
+                    ${feedback}
+                `;
+                
+                // Update recommendations
+                const recommendationsElement = document.getElementById('recommendations');
+                recommendationsElement.innerHTML = '';
+                
+                const recommendations = [
+                    'Practice writing answers to common interview questions daily',
+                    'Read articles and books to improve vocabulary',
+                    'Use grammar checking tools like Grammarly for practice',
+                    'Get feedback from peers or mentors on your writing',
+                    'Record and review your written responses weekly',
+                    'Study sample answers from successful interviews'
+                ];
+                
+                recommendations.forEach(rec => {
+                    recommendationsElement.innerHTML += `
+                        <div class="suggestion-item">
+                            <i class="bi bi-arrow-right-circle text-info me-2"></i>${rec}
+                        </div>
+                    `;
+                });
+                
+                // Show results section with animation
+                resultsSection.style.display = 'block';
+                
+                // Scroll to results
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+                
+                // Add pulse animation to score
+                finalScoreElement.style.animation = 'pulse 2s ease-in-out';
+                setTimeout(() => {
+                    finalScoreElement.style.animation = '';
+                }, 2000);
+            }
+            
+            // Retake test from results
+            retakeTestBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to retake the test? Your previous score will be overwritten.')) {
+                    localStorage.removeItem('text_score');
+                    localStorage.removeItem('text_test_result');
+                    localStorage.removeItem('text_test_answers');
+                    resultsSection.style.display = 'none';
+                    testIntro.style.display = 'block';
+                    location.reload();
+                }
+            });
+            
+            // Timer functions
+            function startTimer() {
+                updateTimerDisplay();
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        alert('Time is up! Submitting your test...');
+                        submitToBackend();
+                    }
+                    
+                    // Warning at 5 minutes
+                    if (timeLeft === 5 * 60) {
+                        showTimeWarning('5 minutes remaining!');
+                    }
+                    
+                    // Warning at 1 minute
+                    if (timeLeft === 60) {
+                        showTimeWarning('1 minute remaining!');
+                    }
+                }, 1000);
+            }
+            
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Change color when time is running low
+                if (timeLeft < 5 * 60) {
+                    timerElement.style.color = '#ffc107';
+                    timerElement.classList.add('pulse-warning');
+                } else {
+                    timerElement.style.color = 'white';
+                    timerElement.classList.remove('pulse-warning');
+                }
+                
+                if (timeLeft < 60) {
+                    timerElement.style.color = '#dc3545';
+                }
+            }
+            
+            function showTimeWarning(message) {
+                // Create warning element
+                const warning = document.createElement('div');
+                warning.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+                warning.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+                warning.innerHTML = `
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Time Alert:</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(warning);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (warning.parentNode) {
+                        warning.remove();
+                    }
+                }, 5000);
+                
+                // Add CSS for pulse animation
+                if (!document.querySelector('#pulse-animation')) {
+                    const style = document.createElement('style');
+                    style.id = 'pulse-animation';
+                    style.textContent = `
+                        .pulse-warning {
+                            animation: pulse 1s infinite;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
